@@ -20,7 +20,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
         Spinner dropdownMenu = findViewById(R.id.dropdownMenu);
 
         ListView listView = findViewById(R.id.listView);
@@ -33,6 +32,5 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void onClickSubmit(View view) {
-
     }
 }
