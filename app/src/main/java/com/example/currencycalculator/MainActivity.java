@@ -12,7 +12,7 @@ import android.widget.Spinner;
 
 public class MainActivity extends AppCompatActivity {
 
-    private String[] items;
+    private static final String[] items = {"DK", "SKK", "USD", "EUR", "NOK", "BPD"};
     ArrayAdapter<String> itemsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, items);
 
     @Override
@@ -21,9 +21,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         Spinner dropdownMenu = findViewById(R.id.dropdownMenu);
+        dropdownMenu.setAdapter(itemsAdapter);
 
         ListView listView = findViewById(R.id.listView);
-        listView.setAdapter(itemsAdapter);
 
         EditText inputText = findViewById(R.id.inputField);
 
