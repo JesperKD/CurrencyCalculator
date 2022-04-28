@@ -10,6 +10,7 @@ import android.widget.ListView;
 import android.widget.Spinner;
 
 import com.example.currencycalculator.Currency.CurrencyCalculator;
+import com.example.currencycalculator.Currency.Sources.FixerCurrency;
 import com.example.currencycalculator.Currency.Sources.MockCurrency;
 import com.example.currencycalculator.Currency.pogos.Rate;
 
@@ -22,6 +23,9 @@ public class MainActivity extends AppCompatActivity {
     private static List<String> history = new ArrayList<>();
     public static ArrayAdapter<String> dropDownAdapter = null;
     public static ArrayAdapter<String> listViewAdapter = null;
+
+    MockCurrency MockCurrency = new MockCurrency();
+    FixerCurrency FixerCurrency = new FixerCurrency();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +41,9 @@ public class MainActivity extends AppCompatActivity {
         ListView listView = findViewById(R.id.listView);
         listView.setAdapter(listViewAdapter);
         listView.setTranscriptMode(2);
+
+        EditText inputField = findViewById(R.id.inputField);
+        inputField.setOnClickListener(v -> onFieldClick());
 
         Button submitButton = findViewById(R.id.submitButton);
         submitButton.setOnClickListener(v -> onClickSubmit());
@@ -61,5 +68,12 @@ public class MainActivity extends AppCompatActivity {
 
         history.add(chosenCountry + ": " + result);
         listViewAdapter.notifyDataSetChanged();
+    }
+
+    private void onFieldClick(){
+        EditText inputField = findViewById(R.id.inputField);
+        if(String.valueOf(inputField.getText()).equals("Euro")){
+            inputField.setText("");
+        }
     }
 }

@@ -7,9 +7,8 @@ public class MockCurrency {
     public MockCurrency() {
     }
 
-    public static Rate[] getMockData() {
-
-        Rate[] array = {
+    public Rate[] getMockData() {
+        return new Rate[]{
                 new Rate("AUD", 1.566015),
                 new Rate("CAD", 1.560132),
                 new Rate("CHF", 1.154727),
@@ -18,9 +17,5 @@ public class MockCurrency {
                 new Rate("JPY", 132.360679),
                 new Rate("USD", 1.23396)
         };
-
-        return array;
     }
-
-
 }
