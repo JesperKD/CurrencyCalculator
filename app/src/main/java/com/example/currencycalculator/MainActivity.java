@@ -63,14 +63,18 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    /**Starts the currency calculation process*/
+    /**
+     * Starts the currency calculation process
+     */
     private void onClickSubmit() throws JSONException, InterruptedException {
         chosenCountry = dropdownMenu.getSelectedItem().toString();
 
         FixerCurrency.getRates(this);
     }
 
-    /**Removes start text in inputfield*/
+    /**
+     * Removes start text in inputfield
+     */
     private void onFieldClick() {
         EditText inputField = findViewById(R.id.inputField);
         if (String.valueOf(inputField.getText()).equals("Euro")) {
@@ -78,16 +82,28 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /**Adds processed Rates to visible listview*/
+    /**
+     * Adds processed Rates to visible listview
+     */
     public static void showResult(List<Rate> rates) {
-        double inputDouble = Double.parseDouble(String.valueOf(inputField.getText()));
+        double inputDouble = 0;
+        inputDouble = Double.parseDouble(String.valueOf(inputField.getText()));
 
         for (Rate item : rates) {
-            if (item.name.equals(chosenCountry)) {
+            //Cleanup both strings
+            String rateName = item.name.replace('"', Character.MIN_VALUE).trim();
+            String chosenName = chosenCountry.replace('"', Character.MIN_VALUE).trim();
+
+            //Ascertain equal
+            boolean equal = rateName.equals(chosenName);
+
+            if (equal) {
                 chosenRate = item;
+                break;
             }
         }
 
+        //Run calculation and then show in listview
         if (chosenRate != null) {
             double result = CurrencyCalculator.calculateCurrency(inputDouble, chosenRate);
             history.add(chosenCountry + ": " + result);
