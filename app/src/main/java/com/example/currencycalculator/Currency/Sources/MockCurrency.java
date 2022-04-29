@@ -2,6 +2,7 @@ package com.example.currencycalculator.Currency.Sources;
 
 import com.example.currencycalculator.Currency.pogos.Rate;
 
+/**Class for mock Data during testing of app*/
 public class MockCurrency {
 
     public MockCurrency() {

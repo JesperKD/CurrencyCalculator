@@ -1,79 +1,82 @@
 package com.example.currencycalculator.Currency.Sources;
 
-import android.content.Context;
-
-import com.android.volley.Cache;
-import com.android.volley.Network;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.BasicNetwork;
-import com.android.volley.toolbox.DiskBasedCache;
-import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+import com.example.currencycalculator.Currency.Abstractions.CurrencyDAO;
 import com.example.currencycalculator.Currency.pogos.Rate;
+import com.example.currencycalculator.MainActivity;
 
+import android.content.Context;
+
+import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class FixerCurrency {
-
-    RequestQueue requestQueue;
+/** Class for handling API Data */
+public class FixerCurrency implements CurrencyDAO {
 
     public FixerCurrency() {
     }
 
-    public List<Rate> getFixerData() throws JSONException {
-        return convertToRates(requestJson());
+    /** Method for starting the data gathering process */
+    public void getRates(Context context) {
+        requestJson(context);
     }
 
-    private void startRequestQueue() {
-        // Instantiate the cache
-        Cache cache = new DiskBasedCache(getCacheDir(), 1024 * 1024); // 1MB cap
+    /** Method for handling request and response from API */
+    private void requestJson(Context context) {
+        // Instantiate the RequestQueue.
+        RequestQueue queue = Volley.newRequestQueue(context);
+        String url = "insert api URL here";
 
-        // Set up the network to use HttpURLConnection as the HTTP client.
-        Network network = new BasicNetwork(new HurlStack());
-
-        // Instantiate the RequestQueue with the cache and network.
-        requestQueue = new RequestQueue(cache, network);
-
-        // Start the queue
-        requestQueue.start();
-    }
-
-    private JSONObject requestJson() {
-
-        String url = "https://data.fixer.io/api/latest  ? access_key = API_KEY";
-        final JSONObject[] jsonObject = {null};
-
+        // Request a string response from the provided URL.
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-
                 (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
-
                     @Override
                     public void onResponse(JSONObject response) {
-                        jsonObject[0] = response;
+                        try {
+                            convertToRates(response);
+                        } catch (JSONException exception) {
+                            exception.printStackTrace();
+                        }
                     }
                 }, new Response.ErrorListener() {
-
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        // TODO: Handle error
+                        System.out.println("Request error: " + error.getMessage());
                     }
                 });
-        startRequestQueue();
-        requestQueue.add(jsonObjectRequest);
 
-        return jsonObject[0];
+        // Add the request to the RequestQueue.
+        queue.add(jsonObjectRequest);
     }
 
-    private static List<Rate> convertToRates(JSONObject jsonObject) throws JSONException {
+    /** converts a JSONObject to a Rate object */
+    private static void convertToRates(JSONObject jsonObject) throws JSONException {
+        List<Rate> rates = new ArrayList<>();
 
-        List<Rate> rates = (List<Rate>) jsonObject.getJSONArray("rates");
-        return rates;
+        try {
+            JSONArray jsonArray = jsonObject.getJSONArray("rates");
+
+            for (int i=0; i < jsonArray.length(); i++) {
+                Rate newRate = new Rate(jsonArray.getString(0), jsonArray.getDouble(1));
+                rates.add(newRate);
+            }
+
+        } catch (JSONException exception) {
+            System.out.println("Conversion error: " + exception.getMessage());
+        } catch (NullPointerException nullPointerException) {
+            System.out.println("Conversion Error: " + nullPointerException.getMessage());
+        }
+
+        MainActivity.showResult(rates);
     }
 
 }

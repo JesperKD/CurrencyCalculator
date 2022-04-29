@@ -14,6 +14,8 @@ import com.example.currencycalculator.Currency.Sources.FixerCurrency;
 import com.example.currencycalculator.Currency.Sources.MockCurrency;
 import com.example.currencycalculator.Currency.pogos.Rate;
 
+import org.json.JSONException;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,10 +23,17 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String[] currencyCodes = {"AUD", "CAD", "CHF", "CNY", "GBP", "JPY", "USD"};
     private static List<String> history = new ArrayList<>();
+    private static String chosenCountry;
+    private static Rate chosenRate;
     public static ArrayAdapter<String> dropDownAdapter = null;
     public static ArrayAdapter<String> listViewAdapter = null;
 
-    MockCurrency MockCurrency = new MockCurrency();
+    private static Spinner dropdownMenu;
+    private static ListView listView;
+    private static EditText inputField;
+    private static Button submitButton;
+
+    /*MockCurrency MockCurrency = new MockCurrency();*/
     FixerCurrency FixerCurrency = new FixerCurrency();
 
     @Override
@@ -32,48 +41,60 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //setup adapters
         dropDownAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, currencyCodes);
         listViewAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, history);
 
-        Spinner dropdownMenu = findViewById(R.id.dropdownMenu);
+        //Setup components
+        dropdownMenu = findViewById(R.id.dropdownMenu);
         dropdownMenu.setAdapter(dropDownAdapter);
-
-        ListView listView = findViewById(R.id.listView);
+        listView = findViewById(R.id.listView);
         listView.setAdapter(listViewAdapter);
         listView.setTranscriptMode(2);
-
-        EditText inputField = findViewById(R.id.inputField);
+        inputField = findViewById(R.id.inputField);
         inputField.setOnClickListener(v -> onFieldClick());
-
-        Button submitButton = findViewById(R.id.submitButton);
-        submitButton.setOnClickListener(v -> onClickSubmit());
+        submitButton = findViewById(R.id.submitButton);
+        submitButton.setOnClickListener(v -> {
+            try {
+                onClickSubmit();
+            } catch (JSONException | InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
-    private void onClickSubmit() {
-        Spinner dropdownMenu = findViewById(R.id.dropdownMenu);
-        EditText inputText = findViewById(R.id.inputField);
+    /**Starts the currency calculation process*/
+    private void onClickSubmit() throws JSONException, InterruptedException {
+        chosenCountry = dropdownMenu.getSelectedItem().toString();
 
-        double inputDouble = Double.parseDouble(String.valueOf(inputText.getText()));
+        FixerCurrency.getRates(this);
+    }
 
-        String chosenCountry = dropdownMenu.getSelectedItem().toString();
-        Rate chosenRate = null;
+    /**Removes start text in inputfield*/
+    private void onFieldClick() {
+        EditText inputField = findViewById(R.id.inputField);
+        if (String.valueOf(inputField.getText()).equals("Euro")) {
+            inputField.setText("");
+        }
+    }
 
-        for (Rate item : MockCurrency.getMockData()) {
+    /**Adds processed Rates to visible listview*/
+    public static void showResult(List<Rate> rates) {
+        double inputDouble = Double.parseDouble(String.valueOf(inputField.getText()));
+
+        for (Rate item : rates) {
             if (item.name.equals(chosenCountry)) {
                 chosenRate = item;
             }
         }
 
-        double result = CurrencyCalculator.calculateCurrency(inputDouble, chosenRate);
-
-        history.add(chosenCountry + ": " + result);
-        listViewAdapter.notifyDataSetChanged();
-    }
-
-    private void onFieldClick(){
-        EditText inputField = findViewById(R.id.inputField);
-        if(String.valueOf(inputField.getText()).equals("Euro")){
-            inputField.setText("");
+        if (chosenRate != null) {
+            double result = CurrencyCalculator.calculateCurrency(inputDouble, chosenRate);
+            history.add(chosenCountry + ": " + result);
+            listViewAdapter.notifyDataSetChanged();
+        } else {
+            System.out.println("Rate was null.");
         }
+
     }
 }

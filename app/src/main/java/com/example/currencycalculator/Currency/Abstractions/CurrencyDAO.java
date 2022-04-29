@@ -1,9 +1,9 @@
 package com.example.currencycalculator.Currency.Abstractions;
 
-import com.example.currencycalculator.Currency.pogos.Rate;
+import android.content.Context;
 
-import java.util.List;
+import org.json.JSONException;
 
 public interface CurrencyDAO {
-    public List<Rate> getRates(String base);
+    public void getRates(Context context) throws JSONException;
 }
