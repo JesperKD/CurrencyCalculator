@@ -17,7 +17,7 @@
         android:ems="10"
         android:inputType="number"
         android:minHeight="48dp"
-        android:text="Euro"
+        android:text="USD"
         android:textAlignment="center"
         app:layout_constraintBottom_toTopOf="@+id/listView"
         app:layout_constraintEnd_toStartOf="@+id/submitButton"
